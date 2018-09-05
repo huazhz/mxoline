@@ -27,7 +27,7 @@ class Course(models.Model):
 
 
 class Lesson(models.Model):
-    course = models.ForeignKey(Course, verbose_name=u"课程")
+    course = models.ForeignKey(Course, verbose_name=u"课程", on_delete=models.CASCADE)  # django2.0以后需要加上
     name = models.CharField(max_length=100, verbose_name=u"章节名")
     add_time = models.DateTimeField(default=datetime.now, verbose_name=u"添加时间")
 
@@ -37,7 +37,7 @@ class Lesson(models.Model):
 
 
 class Video(models.Model):
-    lesson = models.ForeignKey(Lesson, verbose_name=u"章节")
+    lesson = models.ForeignKey(Lesson, verbose_name=u"章节", on_delete=models.CASCADE)
     name = models.CharField(max_length=100, verbose_name=u"视频名称")
 
     class Meta:
@@ -46,7 +46,7 @@ class Video(models.Model):
 
 
 class CourseResources(models.Model):
-    course = models.ForeignKey(Course, verbose_name=u"课程")
+    course = models.ForeignKey(Course, verbose_name=u"课程", on_delete=models.CASCADE)
     name = models.CharField(max_length=100, verbose_name=u"名称")
     download = models.FileField(upload_to="course/%Y/%m", verbose_name=u"资源文件", max_length=100)
     add_time = models.DateTimeField(default=datetime.now, verbose_name=u"添加时间")
