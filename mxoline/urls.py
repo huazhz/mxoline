@@ -18,11 +18,16 @@ from django.urls import path
 import xadmin
 from django.views.generic import TemplateView
 
-from users.views import LoginView
-urlpatterns = [
-    path('xadmin/', xadmin.site.urls),
+from users.views import LoginView, RegisterView
 
+urlpatterns = [
+    # 管理后台
+    path('xadmin/', xadmin.site.urls),
+    # index
     path('', TemplateView.as_view(template_name="index/index.html"), name="index"),
+    # 登陆
     path('login/', LoginView.as_view(), name="login"),
+    # 注册
+    path('register/', RegisterView.as_view(), name="register")
 
 ]
