@@ -61,7 +61,7 @@ ROOT_URLCONF = 'mxoline.urls'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [],
+        'DIRS': [os.path.join(BASE_DIR, 'templates')],  # 增加根目录 templates文件夹搜索
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
@@ -126,3 +126,7 @@ USE_TZ = False
 # https://docs.djangoproject.com/en/2.1/howto/static-files/
 
 STATIC_URL = '/static/'
+# 增加静态文件目录   django2 用列表 而不是元组
+STATICFILES_DIRS = [
+    os.path.join(BASE_DIR, 'static')
+]
