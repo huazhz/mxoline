@@ -6,8 +6,11 @@ from django.views.generic.base import View  # 基类
 from django.contrib.auth.backends import ModelBackend
 from django.db.models import Q
 from django.contrib.auth.hashers import make_password  # 加密函数
-from .models import UserProfile
+
+from .models import UserProfile, EmailVerifyRecord
 from .forms import LoginForm, RegisterForm
+# 邮件发送
+from utils.email_send import send_register_email
 
 
 # 实现用户名邮箱均可登录
@@ -25,6 +28,18 @@ class CustomBackend(ModelBackend):
             return None
 
 
+class ActiveUserView(View):
+    def get(self, request, active_code):
+        all_records = EmailVerifyRecord.objects.filter(code=active_code)  # filter 果查询结果不存在会返回空
+        if all_records:
+            for record in all_records:
+                email = record.email
+                user = UserProfile.objects.get(email=email)  # get 如果查询结果不存在会报错
+                user.is_active = True
+                user.save()
+        return render(request, "login/login.html")
+
+
 class RegisterView(View):
     def get(self, requset):
         register_form = RegisterForm()
@@ -34,17 +49,24 @@ class RegisterView(View):
         register_form = RegisterForm(request.POST)
         if register_form.is_valid():
             # 定义注册字段
-            user_name = request.POST.get("username", "")
+            user_name = request.POST.get("email", "")
             pass_word = request.POST.get("password", "")
             email = request.POST.get("email", "")
             # 实例化模型
             user_profile = UserProfile()
             user_profile.username = user_name
             user_profile.email = email
+            # 默认用户为未激活
+            user_profile.is_active = False
             # 调用加密函数make_password 进行加密
             user_profile.password = make_password(pass_word)
             user_profile.save()
-            return render(request, 'index/index.html')
+
+            send_register_email(email, 'register')
+            return render(request, 'login/login.html')
+
+        else:
+            return render(request, 'register.html', {"register_form": register_form})
 
 
 class LoginView(View):  # 直接调用get方法免去判断   注意不要与函数名称相同
@@ -63,13 +85,17 @@ class LoginView(View):  # 直接调用get方法免去判断   注意不要与函
             user = authenticate(username=user_name, password=pass_word)
             # 如果不是null说明验证成功
             if user is not None:
-                # login_in 两参数：request, user
-                # 实际是对request写了一部分东西进去，然后在render的时候：
-                # request是要render回去的。这些信息也就随着返回浏览器。完成登录
-                login(request, user)
-                # 跳转到首页 user request会被带回到首页
-                return render(request, "index/index.html")
-                # 没有成功说明里面的值是None，并再次跳转回主页面
+                # 判断用户是否是激活的
+                if user.is_active:
+                    # login_in 两参数：request, user
+                    # 实际是对request写了一部分东西进去，然后在render的时候：
+                    # request是要render回去的。这些信息也就随着返回浏览器。完成登录
+                    login(request, user)
+                    # 跳转到首页 user request会被带回到首页
+                    return render(request, "index/index.html")
+                    # 没有成功说明里面的值是None，并再次跳转回主页面
+                else:
+                    return render(request, "login/login.html", {"msg": "用户未激活"})
             else:
                 return render(request, "login/login.html", {"msg": "用户名或密码错误! "})
         else:

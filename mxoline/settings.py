@@ -130,7 +130,15 @@ USE_TZ = False
 # https://docs.djangoproject.com/en/2.1/howto/static-files/
 
 STATIC_URL = '/static/'
-# 增加静态文件目录   django2 用列表 而不是元组
+# 增加静态文件目录   元组单个元素记得加逗号
 STATICFILES_DIRS = (
     os.path.join(BASE_DIR, 'static'),
 )
+
+#配置send_email服务
+EMAIL_HOST = "smtp.ruisfree.com"
+EMAIL_PORT = 80
+EMAIL_HOST_USER = "rui@ruisfree.com"
+EMAIL_HOST_PASSWORD = "RUIs1996"
+EMAIL_USE_TLS = False
+EMAIL_FROM = "rui@ruisfree.com"
