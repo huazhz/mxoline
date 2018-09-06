@@ -29,7 +29,9 @@ DEBUG = True
 ALLOWED_HOSTS = []
 
 # Application definition
-
+AUTHENTICATION_BACKENDS = (
+    'users.views.CustomBackend',
+)
 INSTALLED_APPS = [
 
     'operation.apps.OperationConfig',
@@ -127,6 +129,6 @@ USE_TZ = False
 
 STATIC_URL = '/static/'
 # 增加静态文件目录   django2 用列表 而不是元组
-STATICFILES_DIRS = [
-    os.path.join(BASE_DIR, 'static')
-]
+STATICFILES_DIRS = (
+    os.path.join(BASE_DIR, 'static'),
+)
