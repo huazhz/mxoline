@@ -1,18 +1,24 @@
 from django.shortcuts import render
 # Django自带的用户验证,login
+
 from django.contrib.auth import authenticate, login, logout
 from django.views.generic.base import View  # 基类
 from django.contrib.auth.backends import ModelBackend
 from django.db.models import Q
+from django.contrib.auth.hashers import make_password  # 加密函数
 from .models import UserProfile
-from .forms import LoginForm
+from .forms import LoginForm, RegisterForm
 
 
-# Create your views here.
+# 实现用户名邮箱均可登录
+# 继承ModelBackend类，因为它有方法authenticate，可点进源码查看
 class CustomBackend(ModelBackend):
     def authenticate(self, request, username=None, password=None, **kwargs):
-        try:
+        try:  # 不希望用户存在两个，get只能有一个。两个是get失败的一种原因 Q为使用并集查询
             user = UserProfile.objects.get(Q(username=username) | Q(email=username))
+            # django的后台中密码加密：所以不能password==password
+            # UserProfile继承的AbstractUser中有def check_password(self,
+            # raw_password):
             if user.check_password(password):
                 return user
         except Exception as e:
@@ -21,7 +27,24 @@ class CustomBackend(ModelBackend):
 
 class RegisterView(View):
     def get(self, requset):
-        return render(requset, "register.html")
+        register_form = RegisterForm()
+        return render(requset, "register.html", {'register_form': register_form})
+
+    def post(self, request):
+        register_form = RegisterForm(request.POST)
+        if register_form.is_valid():
+            # 定义注册字段
+            user_name = request.POST.get("username", "")
+            pass_word = request.POST.get("password", "")
+            email = request.POST.get("email", "")
+            # 实例化模型
+            user_profile = UserProfile()
+            user_profile.username = user_name
+            user_profile.email = email
+            # 调用加密函数make_password 进行加密
+            user_profile.password = make_password(pass_word)
+            user_profile.save()
+            return render(request, 'index/index.html')
 
 
 class LoginView(View):  # 直接调用get方法免去判断   注意不要与函数名称相同

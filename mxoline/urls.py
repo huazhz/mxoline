@@ -14,7 +14,7 @@ Including another URLconf
     2. Add a URL to urlpatterns:  path('blog/', include('blog.urls'))
 """
 # from django.contrib import admin
-from django.urls import path
+from django.urls import path, include
 import xadmin
 from django.views.generic import TemplateView
 
@@ -28,6 +28,8 @@ urlpatterns = [
     # 登陆
     path('login/', LoginView.as_view(), name="login"),
     # 注册
-    path('register/', RegisterView.as_view(), name="register")
+    path('register/', RegisterView.as_view(), name="register"),
+    # 验证码
+    path('captcha/', include('captcha.urls')),
 
 ]
