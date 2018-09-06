@@ -3,8 +3,20 @@ __author__ = 'Ruis'
 __date__ = '2018/9/6 上午12:22'
 
 import xadmin
-
+from xadmin import views
 from .models import EmailVerifyRecord, Banner
+
+
+class BaseSetting(object):
+    enable_themes = True  # 打开主题选项
+    use_bootswatch = True  #
+
+
+# 全局变量  设置后台名称和底部名称
+class GlobalSettings(object):
+    site_title = '睿信在线后台管理系统'
+    site_footer = '睿信网络'
+    menu_style = 'accordion'
 
 
 class EmailVerifyRecordAdmin(object):
@@ -21,3 +33,5 @@ class BannerAdmin(object):
 
 xadmin.site.register(EmailVerifyRecord, EmailVerifyRecordAdmin)
 xadmin.site.register(Banner, BannerAdmin)
+xadmin.site.register(views.BaseAdminView, BaseSetting)
+xadmin.site.register(views.CommAdminView, GlobalSettings)
