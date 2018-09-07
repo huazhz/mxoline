@@ -18,7 +18,7 @@ from django.urls import path, include, re_path
 import xadmin
 from django.views.generic import TemplateView
 
-from users.views import LoginView, RegisterView, ActiveUserView, ForgetPwdView, ResetView
+from users.views import LoginView, RegisterView, ActiveUserView, ForgetPwdView, ResetView, ModifyPwdView
 
 urlpatterns = [
     # 管理后台
@@ -36,5 +36,7 @@ urlpatterns = [
     # 找回密码
     path('forget/', ForgetPwdView.as_view(), name="forget_password"),
     # 处理找回密码
-    re_path('reset/(?P<active_code>.*)', ResetView.as_view(), name="user_active"),
+    re_path('reset/(?P<active_code>.*)', ResetView.as_view(), name="reset_pwd"),
+    # 修改重置的密码
+    path('modify_pwd/', ModifyPwdView.as_view(), name="modify_pwd"),
 ]

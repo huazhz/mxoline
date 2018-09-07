@@ -8,7 +8,7 @@ from django.db.models import Q
 from django.contrib.auth.hashers import make_password  # 加密函数
 
 from .models import UserProfile, EmailVerifyRecord
-from .forms import LoginForm, RegisterForm, ForgetForm
+from .forms import LoginForm, RegisterForm, ForgetForm, ModifyPwdForm
 # 邮件发送
 from utils.email_send import send_register_email
 
@@ -55,6 +55,26 @@ class ResetView(View):
         else:
             return render(request, 'active_fail.html')
         return render(request, "login/login.html")
+
+
+class ModifyPwdView(View):
+    # 认证逻辑
+    def post(self, request):
+        modify_form = ModifyPwdForm(request.POST)
+        if modify_form.is_valid():
+            pwd1 = request.POST.get("password1", "")
+            pwd2 = request.POST.get("password2", "")
+            email = request.POST.get("email", "")
+            if pwd1 != pwd2:
+                return render(request, "password_reset.html", {"email": email, "msg": "两次输入的密码不一致"})
+            user = UserProfile.objects.get(email=email)
+            user.password = make_password(pwd2)
+            user.save()
+
+            return render(request, "login/login.html")
+        else:
+            email = request.POST.get("email", "")
+            return render(request, "password_reset.html", {"email": email, "modify_form": modify_form})
 
 
 # 激活页面
