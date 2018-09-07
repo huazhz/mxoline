@@ -8,7 +8,7 @@ from django.db.models import Q
 from django.contrib.auth.hashers import make_password  # 加密函数
 
 from .models import UserProfile, EmailVerifyRecord
-from .forms import LoginForm, RegisterForm
+from .forms import LoginForm, RegisterForm, ForgetForm
 # 邮件发送
 from utils.email_send import send_register_email
 
@@ -28,6 +28,36 @@ class CustomBackend(ModelBackend):
             return None
 
 
+# 找回密码页面
+class ForgetPwdView(View):
+    def get(self, request):
+        forget_form = ForgetForm()
+        return render(request, 'forgetpwd.html', {"forget_form": forget_form})
+
+    def post(self, request):
+        forget_form = ForgetForm(request.POST)
+        if forget_form.is_valid():
+            email = request.POST.get("email", "")
+            send_register_email(email, 'forget')
+            return render(request, "send_success.html")
+        else:
+            return render(request, 'forgetpwd.html', {"forget_form": forget_form})
+
+
+# 找回密码认证逻辑
+class ResetView(View):
+    def get(self, request, active_code):
+        all_records = EmailVerifyRecord.objects.filter(code=active_code)
+        if all_records:
+            for record in all_records:
+                email = record.email
+                return render(request, "password_reset.html", {"email": email})
+        else:
+            return render(request, 'active_fail.html')
+        return render(request, "login/login.html")
+
+
+# 激活页面
 class ActiveUserView(View):
     def get(self, request, active_code):
         all_records = EmailVerifyRecord.objects.filter(code=active_code)  # filter 果查询结果不存在会返回空
@@ -37,9 +67,12 @@ class ActiveUserView(View):
                 user = UserProfile.objects.get(email=email)  # get 如果查询结果不存在会报错
                 user.is_active = True
                 user.save()
+        else:
+            return render(request, 'active_fail.html')
         return render(request, "login/login.html")
 
 
+# 注册页面
 class RegisterView(View):
     def get(self, requset):
         register_form = RegisterForm()
@@ -50,6 +83,9 @@ class RegisterView(View):
         if register_form.is_valid():
             # 定义注册字段
             user_name = request.POST.get("email", "")
+            if UserProfile.objects.filter(email=user_name):
+                return render(request, 'register.html', {'register_form': register_form, "msg": "用户已经存在"})
+
             pass_word = request.POST.get("password", "")
             email = request.POST.get("email", "")
             # 实例化模型
@@ -69,6 +105,7 @@ class RegisterView(View):
             return render(request, 'register.html', {"register_form": register_form})
 
 
+# 登陆页面
 class LoginView(View):  # 直接调用get方法免去判断   注意不要与函数名称相同
     def get(self, request):
         # render就是渲染html返回用户
