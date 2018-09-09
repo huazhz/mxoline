@@ -48,6 +48,8 @@ INSTALLED_APPS = [
     'xadmin',
     'crispy_forms',
     'captcha',
+    # 分页插件
+    'pure_pagination',
 ]
 
 MIDDLEWARE = [
