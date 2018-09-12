@@ -20,7 +20,6 @@ from django.views.generic import TemplateView
 from django.views.static import serve
 
 from users.views import LoginView, RegisterView, ActiveUserView, ForgetPwdView, ResetView, ModifyPwdView
-from organization.views import OrgView
 from mxoline.settings import MEDIA_ROOT
 
 urlpatterns = [
@@ -45,6 +44,8 @@ urlpatterns = [
     # 课程机构首页 放入单独文件中进行处理
     # path('org_list/', OrgView.as_view(), name="org_list"),
     path('org/', include('organization.urls')),
+    # 课程相关url配置
+    path('course/', include('courses.urls')),
     # 处理图片显示的url,使用Django自带serve,传入参数告诉它去哪个路径找，我们有配置好的路径MEDIAROOT
     re_path('media/(?P<path>.*)', serve, {"document_root": MEDIA_ROOT}),
 
