@@ -1,10 +1,11 @@
+import json
 from django.shortcuts import render
 from django.views.generic import View
 from django.http import HttpResponse
 
 from .models import CourseOrg, CityDict
 from pure_pagination import Paginator, EmptyPage, PageNotAnInteger
-
+from  courses.models import Course
 from .forms import UserAskUserForm
 
 
@@ -66,7 +67,78 @@ class AddUserAskView(View):
     def post(self, request):
         userask_form = UserAskUserForm(request.POST)
         if userask_form.is_valid():
+
             user_ask = userask_form.save(commit=True)
-            return HttpResponse("{'status': 'success'}", content_type='application/json')
+            # 此处应讲字典转换为json对象返回给前台ajax
+            return HttpResponse(json.dumps({'status': 'success'}), content_type='application/json')
         else:
-            return HttpResponse("{'status': 'fail', 'msg':'添加出错'}", content_type='application/json')
+            return HttpResponse(json.dumps({'status': 'fail', 'msg': '添加出错'}), content_type='application/json')
+
+
+# 课程机构首页
+class OrgHomeView(View):
+    """
+    机构首页
+    """
+
+    def get(self, request, org_id):
+        current_page = "home"
+        course_org = CourseOrg.objects.get(id=int(org_id))
+        all_courses = course_org.course_set.all()[:3]  # 从Course中取出所有课程  course_set django自动生成的外键方法
+        all_teachers = course_org.teacher_set.all()[:1]
+
+        return render(request, 'org-detail-homepage.html', {
+            'all_courses': all_courses,
+            'all_teachers': all_teachers,
+            'course_org': course_org,
+            'current_page': current_page,
+        })
+
+
+# 机构课程列表页
+class OrgCourseView(View):
+    """
+    机构课程列表页
+    """
+
+    def get(self, request, org_id):
+        course_org = CourseOrg.objects.get(id=int(org_id))
+        all_courses = course_org.course_set.all()  # 从Course中取出所有课程  course_set django自动生成的外键方法
+        current_page = "course"
+        return render(request, 'org-detail-course.html', {
+            'all_courses': all_courses,
+            'course_org': course_org,
+            'current_page': current_page,
+        })
+
+
+# 机构介绍页
+class OrgDescView(View):
+    """
+    机构介绍页
+    """
+
+    def get(self, request, org_id):
+        course_org = CourseOrg.objects.get(id=int(org_id))
+        current_page = "desc"
+        return render(request, 'org-detail-desc.html', {
+            'course_org': course_org,
+            'current_page': current_page,
+        })
+
+
+# 机构讲师页
+class OrgTeacherView(View):
+    """
+    机构教师页
+    """
+
+    def get(self, request, org_id):
+        course_org = CourseOrg.objects.get(id=int(org_id))
+        all_teachers = course_org.teacher_set.all()
+        current_page = "teacher"
+        return render(request, 'org-detail-teachers.html', {
+            'all_teachers': all_teachers,
+            'course_org': course_org,
+            'current_page': current_page,
+        })

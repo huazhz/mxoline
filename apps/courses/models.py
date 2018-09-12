@@ -2,6 +2,8 @@ from datetime import datetime
 
 from django.db import models
 
+from organization.models import CourseOrg
+
 
 # Course -课程基本信息
 # Lesson -章节信息
@@ -10,6 +12,7 @@ from django.db import models
 
 
 class Course(models.Model):
+    course_org = models.ForeignKey(CourseOrg, verbose_name="课程机构", null=True, blank=True, on_delete=models.CASCADE)
     name = models.CharField(max_length=50, verbose_name=u"课程名称")
     desc = models.CharField(max_length=300, verbose_name=u"课程描述")
     detail = models.TextField(verbose_name=u"课程详情")
@@ -30,7 +33,7 @@ class Course(models.Model):
 
 
 class Lesson(models.Model):
-    course = models.ForeignKey(Course, verbose_name=u"课程", on_delete=models.CASCADE)  # django2.0以后需要加上
+    course = models.ForeignKey(Course, verbose_name=u"课程", on_delete=models.CASCADE)  # django2.0以后需要加上 on_delete=models.CASCADE
     name = models.CharField(max_length=100, verbose_name=u"章节名")
     add_time = models.DateTimeField(default=datetime.now, verbose_name=u"添加时间")
 
