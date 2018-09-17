@@ -2,7 +2,7 @@ from datetime import datetime
 
 from django.db import models
 
-from organization.models import CourseOrg
+from organization.models import CourseOrg, Teacher
 
 
 # Course -课程基本信息
@@ -20,6 +20,7 @@ class Course(models.Model):
                               default='cj')
     learn_times = models.IntegerField(default=0, verbose_name=u'学习时长(分钟数)')
     student = models.IntegerField(default=0, verbose_name=u"学习人数")
+    teacher = models.ForeignKey(Teacher, verbose_name='讲师', null=True, blank=True, on_delete=models.CASCADE)
     fav_nums = models.IntegerField(default=0, verbose_name=u"收藏人数")
     image = models.ImageField(upload_to="courses/%Y/%m", verbose_name=u"封面", max_length=100)
     click_nums = models.IntegerField(default=0, verbose_name=u"点击数")
@@ -27,6 +28,9 @@ class Course(models.Model):
     category = models.CharField(max_length=20, verbose_name="课程类别", default="后端开发")
     # 关键词
     tag = models.CharField(max_length=10, verbose_name="课程标签", default="")
+    # 课程须知
+    you_need_know = models.CharField(max_length=200, verbose_name="课程须知", default="")
+    teacher_tell = models.CharField(max_length=200, verbose_name="老师告诉你能知道什么", default="")
 
     class Meta:
         verbose_name = u"课程"
