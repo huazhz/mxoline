@@ -3,6 +3,7 @@ import json
 from django.shortcuts import render
 from django.views.generic import View
 from django.http import HttpResponse
+from django.db.models import Q
 
 from .models import Course, CourseResource, Video
 from operation.models import UserFavorite, CourseComments, UserCourse
@@ -18,6 +19,13 @@ class CourseListView(View):
         all_courses = Course.objects.all().order_by("-add_time")
         # 筛选出热门课程
         hot_courses = Course.objects.all().order_by("-click_nums")[:3]
+        # 课程搜索
+        search_keywords = request.GET.get('keywords', '')
+        if search_keywords:
+            # Django中查询功能 类似like 两个下划线  __icontains    有i表示不区分大小写， 不加i 区分大小写
+            all_courses = all_courses.filter(
+                Q(name__icontains=search_keywords) | Q(desc__icontains=search_keywords) | Q(
+                    detail__icontains=search_keywords))
         # 课程排序
         sort = request.GET.get("sort", "")
         if sort:

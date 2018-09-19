@@ -20,6 +20,7 @@ function sendCodeChangeEmail($btn){
             $btn.attr('disabled',true);
         },
         success: function(data){
+            console.log(data)
             if(data.email){
                 Dml.fun.showValidateError($('#jsChangeEmail'), data.email);
             }else if(data.status == 'success'){
@@ -59,6 +60,7 @@ var verify = verifyDialogSubmit(
             $("#jsChangeEmailTips").html("验证中...").show(500);
         },
         success: function(data) {
+            console.log(data);
             if(data.email){
                 Dml.fun.showValidateError($('#jsChangeEmail'), data.email);
             }else if(data.status == "success"){
@@ -110,8 +112,8 @@ $(function(){
 
     //个人资料头像
     $('.js-img-up').uploadPreview({ Img: ".js-img-show", Width: 94, Height: 94 ,Callback:function(){
-        $('#jsAvatarForm').submit();
-    }});
+            $('#jsAvatarForm').submit();
+        }});
 
 
     $('.changeemai_btn').click(function(){
@@ -148,13 +150,13 @@ $(function(){
     $('#jsEditUserBtn').on('click', function(){
         var _self = $(this),
             $jsEditUserForm = $('#jsEditUserForm')
-            verify = verifySubmit(
+        verify = verifySubmit(
             [
                 {id: '#nick_name', tips: Dml.Msg.epNickName, require: true}
             ]
         );
         if(!verify){
-           return;
+            return;
         }
         $.ajax({
             cache: false,
@@ -171,11 +173,11 @@ $(function(){
                 if(data.nick_name){
                     _showValidateError($('#nick_name'), data.nick_name);
                 }else if(data.birday){
-                   _showValidateError($('#birth_day'), data.birday);
+                    _showValidateError($('#birth_day'), data.birday);
                 }else if(data.address){
-                   _showValidateError($('#address'), data.address);
+                    _showValidateError($('#address'), data.address);
                 }else if(data.status == "failure"){
-                     Dml.fun.showTipsDialog({
+                    Dml.fun.showTipsDialog({
                         title: '保存失败',
                         h2: data.msg
                     });
