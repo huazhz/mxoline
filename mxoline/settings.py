@@ -99,8 +99,8 @@ DATABASES = {
         'NAME': 'mxoline',
         'USER': 'mxoline',
         'PASSWORD': 'qwe123',
-        'HOST': 'yrwxss.ruisfree.com',
-        'PORT': '3306',
+        'HOST': '',
+        'PORT': '',
     }
 }
 
@@ -145,12 +145,12 @@ STATICFILES_DIRS = (
 )
 
 # 配置send_email服务
-EMAIL_HOST = "smtp.ruisfree.com"
+EMAIL_HOST = ""
 EMAIL_PORT = 80
-EMAIL_HOST_USER = "rui@ruisfree.com"
-EMAIL_HOST_PASSWORD = "RUIs1996"
+EMAIL_HOST_USER = ""
+EMAIL_HOST_PASSWORD = ""
 EMAIL_USE_TLS = False
-EMAIL_FROM = "rui@ruisfree.com"
+EMAIL_FROM = ""
 
 MEDIA_URL = '/media/'
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
