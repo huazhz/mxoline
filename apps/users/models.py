@@ -7,10 +7,12 @@ from django.contrib.auth.models import AbstractUser
 class UserProfile(AbstractUser):
     nick_name = models.CharField(max_length=50, verbose_name=u"昵称", default="")
     birday = models.DateField(verbose_name=u"生日", null=True)
-    gender = models.CharField(choices=(("male", u"男"), ("female", u"女")), default="female", max_length=6)
-    address = models.CharField(max_length=100, default=u"")
-    mobile = models.CharField(max_length=11, null=True)
-    image = models.ImageField(upload_to="image/%Y/%m", default=u"image/default.png", max_length=100)
+    gender = models.CharField(choices=(("male", u"男"), ("female", u"女")), default="female", max_length=6,
+                              verbose_name="性别")
+    address = models.CharField(max_length=100, default=u"", verbose_name="地址", null=True, blank=True)
+    mobile = models.CharField(max_length=11, null=True, verbose_name="手机号", blank=True)
+    image = models.ImageField(upload_to="image/%Y/%m", default=u"image/default.png", max_length=100, verbose_name="头像",
+                              null=True, blank=True)
 
     class Meta:
         verbose_name = "用户信息"
@@ -20,7 +22,7 @@ class UserProfile(AbstractUser):
     def unread_nums(self):
         # 必须在这里引用 防止循环import
         from operation.models import UserMessage
-        return UserMessage.objects.filter(user=self.id).count()
+        return UserMessage.objects.filter(user=self.id, has_read=False).count()
 
 
 class EmailVerifyRecord(models.Model):

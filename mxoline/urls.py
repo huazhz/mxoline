@@ -16,10 +16,10 @@ Including another URLconf
 # from django.contrib import admin
 from django.urls import path, include, re_path
 import xadmin
-from django.views.generic import TemplateView
 from django.views.static import serve
 
-from users.views import LoginView, RegisterView, ActiveUserView, ForgetPwdView, ResetView, ModifyPwdView
+from users.views import LoginView, RegisterView, ActiveUserView, ForgetPwdView, ResetView, ModifyPwdView, LogoutView, \
+    IndexView
 from mxoline.settings import MEDIA_ROOT
 
 urlpatterns = [
@@ -27,10 +27,13 @@ urlpatterns = [
     path('xadmin/', xadmin.site.urls),
 
     # index
-    path('', TemplateView.as_view(template_name="index/index.html"), name="index"),
+    path('', IndexView.as_view(), name="index"),
 
     # 登陆
     path('login/', LoginView.as_view(), name="login"),
+
+    # 退出
+    path('logout/', LogoutView.as_view(), name="logout"),
 
     # 注册
     path('register/', RegisterView.as_view(), name="register"),
@@ -60,7 +63,11 @@ urlpatterns = [
     # 处理图片显示的url,使用Django自带serve,传入参数告诉它去哪个路径找，我们有配置好的路径MEDIAROOT
     re_path('media/(?P<path>.*)', serve, {"document_root": MEDIA_ROOT}),
 
+    # 关闭Debug后, 在生产环境中django不会自动去寻找静态文件
+    # re_path('static/(?P<path>.*)', serve, {"document_root": STATIC_ROOT}),
     # 个人中心相关url配置
     path('users/', include('users.urls')),
 
 ]
+
+

@@ -22,12 +22,14 @@ class Course(models.Model):
     student = models.IntegerField(default=0, verbose_name=u"学习人数")
     teacher = models.ForeignKey(Teacher, verbose_name='讲师', null=True, blank=True, on_delete=models.CASCADE)
     fav_nums = models.IntegerField(default=0, verbose_name=u"收藏人数")
-    image = models.ImageField(upload_to="courses/%Y/%m", verbose_name=u"封面", max_length=100)
+    image = models.ImageField(upload_to="courses/%Y/%m", verbose_name=u"封面", max_length=100, blank=True)
     click_nums = models.IntegerField(default=0, verbose_name=u"点击数")
     add_time = models.DateTimeField(default=datetime.now, verbose_name=u"添加时间")
     category = models.CharField(max_length=20, verbose_name="课程类别", default="后端开发")
     # 关键词
     tag = models.CharField(max_length=10, verbose_name="课程标签", default="")
+    # 是否是放在轮播图中
+    is_banner = models.BooleanField(default=False, verbose_name="是否轮播")
     # 课程须知
     you_need_know = models.CharField(max_length=200, verbose_name="课程须知", default="")
     teacher_tell = models.CharField(max_length=200, verbose_name="老师告诉你能知道什么", default="")
@@ -41,6 +43,17 @@ class Course(models.Model):
         # 获取课程章节数
         return self.lesson_set.all().count()
 
+    # 设置函数在后台的显示内容
+    get_zj_nums.short_description = "章节数"
+
+    # 设置一个跳转
+    def go_to(self):
+        from django.utils.safestring import mark_safe
+        # 如果不调用mark safe 会将字符串进行转义保障安全
+        return mark_safe("<a href='https://www.ruisfree.com'>跳转</a>")
+
+    go_to.short_description = "跳转"
+
     # 获取学习该课程的用户有哪些
     def get_learn_users(self):
         return self.usercourse_set.all()[:5]
@@ -51,6 +64,15 @@ class Course(models.Model):
 
     def __str__(self):
         return self.name
+
+
+# 轮播课程model  集成Course
+class BannerCourse(Course):
+    class Meta:
+        verbose_name = "轮播课程"
+        verbose_name_plural = verbose_name
+        # 设置之后不会生成一张表，只是为了在后台进行显示不同的数据
+        proxy = True
 
 
 class Lesson(models.Model):

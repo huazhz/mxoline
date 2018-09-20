@@ -4,7 +4,12 @@ __date__ = '2018/9/6 上午12:22'
 
 import xadmin
 from xadmin import views
-from .models import EmailVerifyRecord, Banner
+from xadmin.plugins.auth import UserAdmin
+from .models import EmailVerifyRecord, Banner, UserProfile
+
+
+class UserProFileAdmin(UserAdmin):
+    pass
 
 
 class BaseSetting(object):
@@ -33,5 +38,8 @@ class BannerAdmin(object):
 
 xadmin.site.register(EmailVerifyRecord, EmailVerifyRecordAdmin)
 xadmin.site.register(Banner, BannerAdmin)
+# 先解除注册
+xadmin.site.unregister(UserProfile)
+xadmin.site.register(UserProfile, UserProFileAdmin)
 xadmin.site.register(views.BaseAdminView, BaseSetting)
 xadmin.site.register(views.CommAdminView, GlobalSettings)

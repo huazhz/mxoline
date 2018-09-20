@@ -2,15 +2,16 @@ import json
 from django.shortcuts import render
 # Django自带的用户验证,login
 
-from django.http import HttpResponse
+from django.http import HttpResponse, HttpResponseRedirect
 from django.contrib.auth import authenticate, login, logout
 from django.views.generic.base import View  # 基类
 from django.contrib.auth.backends import ModelBackend
 from django.db.models import Q
 from django.contrib.auth.hashers import make_password  # 加密函数
+from django.urls import reverse
 from pure_pagination import Paginator, EmptyPage, PageNotAnInteger  # 分页
 
-from .models import UserProfile, EmailVerifyRecord
+from .models import UserProfile, EmailVerifyRecord, Banner
 from .forms import LoginForm, RegisterForm, ForgetForm, ModifyPwdForm, UploadImageForm, UserInfoForm
 # 引入用户课程
 from operation.models import UserCourse, UserFavorite, UserMessage
@@ -165,14 +166,23 @@ class LoginView(View):  # 直接调用get方法免去判断   注意不要与函
                     # request是要render回去的。这些信息也就随着返回浏览器。完成登录
                     login(request, user)
                     # 跳转到首页 user request会被带回到首页
-                    return render(request, "index/index.html")
-                    # 没有成功说明里面的值是None，并再次跳转回主页面
+                    return HttpResponseRedirect(reverse('index'))
+                # 没有成功说明里面的值是None，并再次跳转回主页面
                 else:
                     return render(request, "login/login.html", {"msg": "用户未激活"})
             else:
                 return render(request, "login/login.html", {"msg": "用户名或密码错误! "})
         else:
             return render(request, "login/login.html", {"login_form": login_form})
+
+
+# 退出逻辑
+class LogoutView(View):
+    def get(self, request):
+        # 调用Django自带的退出逻辑
+        logout(request)
+        # 调用reverse 将自定义的url名称解析成字符串
+        return HttpResponseRedirect(reverse("users:users_info"))
 
 
 # 用户个人信息页面
@@ -314,7 +324,11 @@ class MyFavCourseView(LoginRequiredMixin, View):
 class MymessageView(LoginRequiredMixin, View):
     def get(self, request):
         all_message = UserMessage.objects.filter(user=request.user.id)
-
+        # 进入个人中心后情况未读消息记录
+        all_unread_messages = UserMessage.objects.filter(user=request.user.id, has_read=False)
+        for unread_message in all_unread_messages:
+            unread_message.has_read = True
+            unread_message.save()
         # 对个人消息进行分页
         # 尝试获取前台get请求传递过来的page参数
         # 如果是不合法的配置参数默认返回第一页
@@ -329,3 +343,21 @@ class MymessageView(LoginRequiredMixin, View):
             "all_message": all_message,
 
         })
+
+
+# 首页View
+class IndexView(View):
+    def get(self, request):
+        # 取出轮播图
+        all_banners = Banner.objects.all().order_by('index')
+        # 取出课程
+        courses = Course.objects.filter(is_banner=False)[:6]
+        banner_courses = Course.objects.filter(is_banner=True)[:3]
+        course_orgs = CourseOrg.objects.all()[:15]
+        return render(request, 'index/index.html', {
+            "all_banners": all_banners,
+            "courses": courses,
+            "banner_courses": banner_courses,
+            "course_orgs": course_orgs,
+        })
+

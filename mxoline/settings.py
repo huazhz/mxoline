@@ -26,7 +26,7 @@ SECRET_KEY = '%#)gz2&vn^3de*)l-(#4q!bp%86w9wwd9^*oo#!@bt#t5tj=xp'
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ["*"]
 
 # Application definition
 AUTHENTICATION_BACKENDS = (
@@ -149,3 +149,7 @@ EMAIL_FROM = "rui@ruisfree.com"
 
 MEDIA_URL = '/media/'
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
+
+# STATIC_URL = '/static/'
+# STATIC_ROOT = os.path.join(BASE_DIR, 'static')
+
