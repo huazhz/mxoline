@@ -3,7 +3,6 @@ __author__ = 'Ruis'
 __date__ = '2018/9/6 上午12:50'
 
 from .models import Course, Lesson, Video, CourseResource, BannerCourse
-from organization.models import CourseOrg
 import xadmin
 
 
@@ -40,13 +39,15 @@ class CourseAdmin(object):
     inlines = [LessonInline, CourseResourceInline]
     # 定时刷新工具
     refresh_times = [3, 5]
+    # 富文本
+    style_fields = {"detail": "ueditor"}
 
     def queryset(self):
         qs = super(CourseAdmin, self).queryset()
         qs = qs.filter(is_banner=False)
         return qs
 
-#    在保存课程的时候统计课程机构的课程数
+    #    在保存课程的时候统计课程机构的课程数
     def save_models(self):
         obj = self.new_obj
         obj.save()

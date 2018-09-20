@@ -4,6 +4,9 @@ from django.db import models
 
 from organization.models import CourseOrg, Teacher
 
+# 引用富文本
+from DjangoUeditor.models import UEditorField
+
 
 # Course -课程基本信息
 # Lesson -章节信息
@@ -15,7 +18,8 @@ class Course(models.Model):
     course_org = models.ForeignKey(CourseOrg, verbose_name="课程机构", null=True, blank=True, on_delete=models.CASCADE)
     name = models.CharField(max_length=50, verbose_name=u"课程名称")
     desc = models.CharField(max_length=300, verbose_name=u"课程描述")
-    detail = models.TextField(verbose_name=u"课程详情")
+    # 富文本Ueditor
+    detail = UEditorField(verbose_name=u"课程详情", width=600, height=300, imagePath="courses/ueditor/", filePath="courses/ueditor/",default='')
     degree = models.CharField(choices=(('cj', u'初级'), ('zj', u'中极'), ('gj', u'高级')), max_length=2, verbose_name="难度",
                               default='cj')
     learn_times = models.IntegerField(default=0, verbose_name=u'学习时长(分钟数)')

@@ -68,6 +68,7 @@ urlpatterns = [
     # 个人中心相关url配置
     path('users/', include('users.urls')),
 
+    # 富文本相关Url
+    path('ueditor/', include('DjangoUeditor.urls')),
+
 ]
-
-

@@ -17,6 +17,9 @@ import sys
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 sys.path.insert(0, os.path.join(BASE_DIR, 'apps'))  # 将app加入默认路径下
 
+# 增加extra_apps 文件夹的搜索路径
+sys.path.insert(0, os.path.join(BASE_DIR, 'extra_apps'))
+
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/2.1/howto/deployment/checklist/
 
@@ -50,6 +53,8 @@ INSTALLED_APPS = [
     'captcha',
     # 分页插件
     'pure_pagination',
+    # 富文本
+    'DjangoUeditor',
 ]
 
 MIDDLEWARE = [
@@ -152,4 +157,3 @@ MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 
 # STATIC_URL = '/static/'
 # STATIC_ROOT = os.path.join(BASE_DIR, 'static')
-
